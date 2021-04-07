@@ -2,14 +2,14 @@ package com.azeam.stock.service;
 
 import com.azeam.stock.dto.ProductDto;
 
-import javassist.NotFoundException;
-
 public interface StockService {
-    ProductDto createProduct(ProductDto productDto); 
+    ProductDto createProduct(ProductDto productDtoIn); 
 
-    String getProduct(ProductDto productDtoIn);
+    ProductDto getProduct(ProductDto productDtoIn);
 
-    String updateProduct();
+    String updateProduct(ProductDto productDtoIn);
 
-    String deleteUser();
+    String deleteProduct(ProductDto productDtoIn);
+
+    ProductDto[] getProducts();
 }

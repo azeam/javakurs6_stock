@@ -6,7 +6,7 @@ public class ProductDto implements Serializable {
     private static final long serialVersionUID = 8906566600256227911L;
     private long id;
     private String name;
-    private String product_id;
+    private String pid;
     private String category;
     private int cost;
 
@@ -26,12 +26,12 @@ public class ProductDto implements Serializable {
         this.name = name;
     }
 
-    public String getProduct_id() {
-        return this.product_id;
+    public String getPid() {
+        return this.pid;
     }
 
-    public void setProduct_id(String product_id) {
-        this.product_id = product_id;
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 
     public String getCategory() {

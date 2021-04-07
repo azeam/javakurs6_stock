@@ -1,18 +1,18 @@
 package com.azeam.stock.model.request;
 
 public class ProductDetailsRequestModel {
-    private String product_id;
+    private String pid;
     private String name;
     private String category;
 
     private int cost;
 
-    public String getProduct_id() {
-        return this.product_id;
+    public String getPid() {
+        return this.pid;
     }
 
-    public void setProduct_id(String product_id) {
-        this.product_id = product_id;
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 
     public String getName() {

@@ -16,8 +16,8 @@ public class ProductEntity implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 50)
-    private String product_id;
+    @Column(length = 255)
+    private String pid;
 
     @Column(length = 50)
     private String category;
@@ -41,12 +41,12 @@ public class ProductEntity implements Serializable {
         this.name = name;
     }
 
-    public String getProduct_id() {
-        return this.product_id;
+    public String getPid() {
+        return this.pid;
     }
 
-    public void setProduct_id(String product_id) {
-        this.product_id = product_id;
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 
     public String getCategory() {
