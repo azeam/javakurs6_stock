@@ -1,8 +1,6 @@
 package com.azeam.stock.service.impl;
 
-import java.beans.FeatureDescriptor;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.azeam.stock.dto.ProductDto;
@@ -11,11 +9,11 @@ import com.azeam.stock.model.request.ProductDetailsRequestModel;
 import com.azeam.stock.repository.ProductRepository;
 import com.azeam.stock.service.StockService;
 import com.azeam.stock.service.util.Encryption;
+import com.azeam.stock.service.util.Filter;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -42,18 +40,29 @@ public class StockServiceImpl implements StockService {
         return productDtoOut;
     }
 
-
     @Override
-    public String deleteProduct(ProductDto productDtoIn) {
-        return null;
+    public ResponseEntity<String> deleteProduct(ProductDto productDtoIn) {
+        ProductEntity productEntity = new ProductEntity();
+        BeanUtils.copyProperties(productDtoIn, productEntity);
+        productRepository.delete(productEntity);
+        // 404 will be thrown earlier if not found
+        return ResponseEntity.ok("Product deleted");
     }
 
     @Override
     public ProductDto createProduct(ProductDto productDtoIn) {
+        // name needs to be set, otherwise return 400
+        if (productDtoIn.getName() == null) {
+            throw new ResponseStatusException (
+                HttpStatus.BAD_REQUEST, "No product name set"
+            );
+        }
+
         // set generated pid to entity and save to db
         ProductEntity productEntity = new ProductEntity();
         BeanUtils.copyProperties(productDtoIn, productEntity);
         Encryption enc = new Encryption();
+        
         productEntity.setPid(enc.generateHash(productDtoIn.getName()));
         ProductEntity productEntityOut = productRepository.save(productEntity);
 
@@ -86,7 +95,8 @@ public class StockServiceImpl implements StockService {
         BeanUtils.copyProperties(productDtoIn, productEntity);
 
         // set new data where not null (only fields that should be updated)
-        BeanUtils.copyProperties(productDetailsModel, productEntity, getNullPropertyNames(productDetailsModel));
+        Filter filter = new Filter();
+        BeanUtils.copyProperties(productDetailsModel, productEntity, filter.getNullPropertyNames(productDetailsModel));
 
         // save new data
         ProductEntity productEntityOut = productRepository.save(productEntity);
@@ -97,11 +107,6 @@ public class StockServiceImpl implements StockService {
         return productDtoOut;
     }
 
-    // filter out non null values
-    private String[] getNullPropertyNames(Object source) {
-        final BeanWrapper wrappedSource = new BeanWrapperImpl(source);
-        return Stream.of(wrappedSource.getPropertyDescriptors()).map(FeatureDescriptor::getName)
-                .filter(propertyName -> wrappedSource.getPropertyValue(propertyName) == null).toArray(String[]::new);
-    }
+    
 
 }

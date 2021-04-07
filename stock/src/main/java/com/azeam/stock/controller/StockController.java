@@ -6,6 +6,7 @@ import com.azeam.stock.model.response.ProductResponseModel;
 import com.azeam.stock.service.StockService;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,17 +85,24 @@ public class StockController {
         // pass dto to edit and new data to service
         ProductDto productDtoOut = stockService.updateProduct(productDtoToEdit, productDetailsModel);
 
-        // copy dto out from service layer to response
+        // copy dto out from service layer to response, show updated object
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(productDtoOut, response);
         return response;
     }
 
-    @DeleteMapping
-    public String deleteProduct(ProductDetailsRequestModel productDetailsModel) {
+    @DeleteMapping(value="/{pid}")
+    public ResponseEntity<String> deleteProduct(@PathVariable String pid) {
         ProductDto productDtoIn = new ProductDto();
-        BeanUtils.copyProperties(productDetailsModel, productDtoIn);
-        return stockService.deleteProduct(productDtoIn);
+        productDtoIn.setPid(pid);
+        
+        // get dto of product with id
+        ProductDto productDtoToEdit = stockService.getProduct(productDtoIn);
+
+        // pass dto to edit and new data to service
+        ResponseEntity<String> productDtoOut = stockService.deleteProduct(productDtoToEdit);
+
+        return productDtoOut;
     }
 
 }
