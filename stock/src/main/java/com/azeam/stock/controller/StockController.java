@@ -25,10 +25,10 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    @GetMapping(value="/{id}")
-    public ProductResponseModel getProduct(@PathVariable String id) {
+    @GetMapping(value="/{pid}")
+    public ProductResponseModel getProduct(@PathVariable String pid) {
         ProductDto productDtoIn = new ProductDto();
-        productDtoIn.setPid(id);
+        productDtoIn.setPid(pid);
 
         // pass dto in to service layer
         ProductDto productDtoOut = stockService.getProduct(productDtoIn);
@@ -45,6 +45,7 @@ public class StockController {
         ProductDto[] productDtoOut = stockService.getProducts();
         ProductResponseModel[] products = new ProductResponseModel[productDtoOut.length];
         
+        // build array with models from dtos
         int count = 0;
         for (ProductDto productDto: productDtoOut) {
             ProductResponseModel response = new ProductResponseModel();
@@ -52,6 +53,7 @@ public class StockController {
             products[count] = response;
             count++;
         }
+
         return products;
     }
 
@@ -71,11 +73,21 @@ public class StockController {
         return response;
     } 
 
-    @PutMapping
-    public String updateProduct(ProductDetailsRequestModel productDetailsModel) {
+    @PutMapping(value="/{pid}")
+    public ProductResponseModel updateProduct(@PathVariable String pid, @RequestBody ProductDetailsRequestModel productDetailsModel) {
         ProductDto productDtoIn = new ProductDto();
-        BeanUtils.copyProperties(productDetailsModel, productDtoIn);
-        return stockService.updateProduct(productDtoIn);
+        productDtoIn.setPid(pid);
+        
+        // get dto of product with id
+        ProductDto productDtoToEdit = stockService.getProduct(productDtoIn);
+
+        // pass dto to edit and new data to service
+        ProductDto productDtoOut = stockService.updateProduct(productDtoToEdit, productDetailsModel);
+
+        // copy dto out from service layer to response
+        ProductResponseModel response = new ProductResponseModel();
+        BeanUtils.copyProperties(productDtoOut, response);
+        return response;
     }
 
     @DeleteMapping
