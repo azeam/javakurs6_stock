@@ -13,7 +13,6 @@ import com.azeam.stock.service.util.Filter;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,12 +40,10 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public ResponseEntity<String> deleteProduct(ProductDto productDtoIn) {
+    public void deleteProduct(ProductDto productDtoIn) {
         ProductEntity productEntity = new ProductEntity();
         BeanUtils.copyProperties(productDtoIn, productEntity);
-        productRepository.delete(productEntity);
-        // 404 will be thrown earlier if not found
-        return ResponseEntity.ok("Product deleted");
+        productRepository.delete(productEntity); // 404 will be thrown earlier if not found
     }
 
     @Override

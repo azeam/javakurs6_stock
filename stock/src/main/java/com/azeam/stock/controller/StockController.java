@@ -6,6 +6,7 @@ import com.azeam.stock.model.response.ProductResponseModel;
 import com.azeam.stock.service.StockService;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class StockController {
     }
 
     @GetMapping(value="/{pid}")
-    public ProductResponseModel getProduct(@PathVariable String pid) {
+    public ResponseEntity<ProductResponseModel> getProduct(@PathVariable String pid) {
         ProductDto productDtoIn = new ProductDto();
         productDtoIn.setPid(pid);
 
@@ -38,11 +39,11 @@ public class StockController {
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(productDtoOut, response);
 
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @GetMapping
-    public ProductResponseModel[] getProducts() {
+    public ResponseEntity<ProductResponseModel[]> getProducts() {
         ProductDto[] productDtoOut = stockService.getProducts();
         ProductResponseModel[] products = new ProductResponseModel[productDtoOut.length];
         
@@ -54,12 +55,11 @@ public class StockController {
             products[count] = response;
             count++;
         }
-
-        return products;
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @PostMapping
-    public ProductResponseModel createProduct(@RequestBody ProductDetailsRequestModel productDetailsModel) {
+    public ResponseEntity<ProductResponseModel> createProduct(@RequestBody ProductDetailsRequestModel productDetailsModel) {
         // copy json to dto in
         ProductDto productDtoIn = new ProductDto();
         BeanUtils.copyProperties(productDetailsModel, productDtoIn);
@@ -71,11 +71,11 @@ public class StockController {
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(productDtoOut, response);
 
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     } 
 
     @PutMapping(value="/{pid}")
-    public ProductResponseModel updateProduct(@PathVariable String pid, @RequestBody ProductDetailsRequestModel productDetailsModel) {
+    public ResponseEntity<ProductResponseModel> updateProduct(@PathVariable String pid, @RequestBody ProductDetailsRequestModel productDetailsModel) {
         ProductDto productDtoIn = new ProductDto();
         productDtoIn.setPid(pid);
         
@@ -88,7 +88,8 @@ public class StockController {
         // copy dto out from service layer to response, show updated object
         ProductResponseModel response = new ProductResponseModel();
         BeanUtils.copyProperties(productDtoOut, response);
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
+        
     }
 
     @DeleteMapping(value="/{pid}")
@@ -100,9 +101,8 @@ public class StockController {
         ProductDto productDtoToEdit = stockService.getProduct(productDtoIn);
 
         // pass dto to edit and new data to service
-        ResponseEntity<String> productDtoOut = stockService.deleteProduct(productDtoToEdit);
-
-        return productDtoOut;
+        stockService.deleteProduct(productDtoToEdit);
+        return new ResponseEntity<>("Product deleted", HttpStatus.OK);
     }
 
 }
